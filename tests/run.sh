@@ -41,6 +41,8 @@ run_case 'both-off + known -> RESULT: no-change' status-off-both.json terminal-k
 run_case 'plushie-on + known -> RESULT: alert' status-plushie-on.json terminal-known.html 0 'RESULT: alert'
 run_case 'both-off + new -> RESULT: alert' status-off-both.json terminal-new.html 0 'RESULT: alert'
 run_case 'bad JSON -> exit 1' status-bad.json terminal-known.html 1 ''
+run_case 'plushie-on + page fetch fails -> RESULT: alert' status-plushie-on.json missing.html 0 'RESULT: alert'
+run_case 'both-off + page fetch fails -> exit 1' status-off-both.json missing.html 1 ''
 run_case '--dry-run --test -> RESULT: test' status-off-both.json terminal-known.html 0 'RESULT: test' --test
 
 if (( failures > 0 )); then

@@ -49,28 +49,35 @@ else
     exit 1
   fi
 
-  html=$(fetch "$TERMINAL_URL")
-  known_urls='https://app.brilliantmade.com/r/claude-code-plushies
-https://app.brilliantmade.com/r/claude-code-stickers'
-  # No matches is a valid change: every known URL has been removed.
-  current_urls=$({ grep -Eo 'https://app\.brilliantmade\.com/r/[A-Za-z0-9_-]+' <<< "$html" || true; } | tr -d '\r' | sort -u)
-
   reasons=()
   if [[ "$off" != '["plushie","stickers"]' ]]; then
     reasons+=("swag-status.json changed: $off")
   fi
-  if [[ "$current_urls" != "$known_urls" ]]; then
-    reasons+=('申込フォーム URL が変わりました:')
-    while IFS= read -r url; do
-      if [[ -n "$url" && $'\n'"$known_urls"$'\n' != *$'\n'"$url"$'\n'* ]]; then
-        reasons+=("追加: $url")
-      fi
-    done <<< "$current_urls"
-    while IFS= read -r url; do
-      if [[ $'\n'"$current_urls"$'\n' != *$'\n'"$url"$'\n'* ]]; then
-        reasons+=("削除: $url")
-      fi
-    done <<< "$known_urls"
+
+  known_urls='https://app.brilliantmade.com/r/claude-code-plushies
+https://app.brilliantmade.com/r/claude-code-stickers'
+  current_urls=''
+  # A confirmed status change must still alert when the page fetch fails.
+  if html=$(fetch "$TERMINAL_URL"); then
+    # No matches is a valid change: every known URL has been removed.
+    current_urls=$({ grep -Eo 'https://app\.brilliantmade\.com/r/[A-Za-z0-9_-]+' <<< "$html" || true; } | tr -d '\r' | sort -u)
+    if [[ "$current_urls" != "$known_urls" ]]; then
+      reasons+=('申込フォーム URL が変わりました:')
+      while IFS= read -r url; do
+        if [[ -n "$url" && $'\n'"$known_urls"$'\n' != *$'\n'"$url"$'\n'* ]]; then
+          reasons+=("追加: $url")
+        fi
+      done <<< "$current_urls"
+      while IFS= read -r url; do
+        if [[ $'\n'"$current_urls"$'\n' != *$'\n'"$url"$'\n'* ]]; then
+          reasons+=("削除: $url")
+        fi
+      done <<< "$known_urls"
+    fi
+  elif (( ${#reasons[@]} == 0 )); then
+    exit 1
+  else
+    reasons+=('Terminal ページの取得に失敗したため、申込フォーム URL は未確認')
   fi
 
   if (( ${#reasons[@]} == 0 )); then

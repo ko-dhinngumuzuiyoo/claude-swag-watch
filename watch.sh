@@ -30,7 +30,7 @@ fetch() {
 if "$test_mode"; then
   label=swag-test
   title='[TEST] claude-swag-watch 通知テスト'
-  result=test
+  result='test'
   body_file=$(mktemp)
   printf '@%s\n\nclaude-swag-watch の通知テストです。スマートフォンに通知が届くか確認してください。\n確認後はこの Issue を閉じてください。\n' "$NOTIFY_USER" > "$body_file"
 else

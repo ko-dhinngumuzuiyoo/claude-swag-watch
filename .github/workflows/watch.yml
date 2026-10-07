@@ -2,7 +2,8 @@ name: watch
 
 on:
   schedule:
-    - cron: '*/10 * * * *'
+    # Avoid minute 0: GitHub drops/delays scheduled runs at the top of the hour.
+    - cron: '7-59/10 * * * *'
   workflow_dispatch:
     inputs:
       test:

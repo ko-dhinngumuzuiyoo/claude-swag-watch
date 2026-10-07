@@ -85,6 +85,7 @@ https://app.brilliantmade.com/r/claude-code-stickers'
   {
     printf '@%s\n\nClawd グッズの配布状況に変化がありました。\n\n検出理由:\n' "$NOTIFY_USER"
     printf -- '- %s\n' "${reasons[@]}"
+    # shellcheck disable=SC2016 # backticks are a literal Markdown code fence
     printf '\n取得したステータス JSON:\n```json\n%s\n```\n' "$status_json"
     printf '\n現在の申込フォーム URL:\n%s\n' "${current_urls:-（なし）}"
     printf '\nhttps://claude.dev/terminal/\n\nTerminal を開いて /plushies または /stickers と入力\n'

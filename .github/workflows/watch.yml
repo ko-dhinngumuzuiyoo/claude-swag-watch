@@ -1,0 +1,38 @@
+name: watch
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+    inputs:
+      test:
+        description: '通知テスト用の Issue を作成する'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: watch
+  cancel-in-progress: false
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      NOTIFY_USER: ${{ github.repository_owner }}
+      TEST_MODE: ${{ inputs.test }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Watch giveaway status
+        run: |
+          if [[ "$TEST_MODE" == 'true' ]]; then
+            bash watch.sh --test
+          else
+            bash watch.sh
+          fi
